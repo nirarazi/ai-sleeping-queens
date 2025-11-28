@@ -59,7 +59,7 @@ export const Card: React.FC<CardProps> = ({ card, onClick, selected, faceDown, b
     if (card.name && card.name !== card.type) {
         // If translation exists, use it, otherwise format the name
         // e.g. 'tie-dye' -> 'Tie Dye'
-        return t(`cards.names.${card.name}`, { defaultValue: card.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
+        return t(`cards.names.${card.name}`, { defaultValue: card.name.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) });
     }
     return t(`cards.${card.type}`, { defaultValue: card.name || card.type });
   };
