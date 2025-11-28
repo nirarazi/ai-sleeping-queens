@@ -1,0 +1,79 @@
+@import './Game.css';
+
+.card.type-queen {
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: transparent !important;
+    position: relative;
+}
+
+.card.type-queen .card-top,
+.card.type-queen .card-name {
+    display: none;
+}
+
+/* Individual images */
+
+.card.type-queen.queen-book {
+    background-image: url('../assets/queens/book.png');
+}
+
+.card.type-queen.queen-butterfly {
+    background-image: url('../assets/queens/butterfly.png');
+}
+
+.card.type-queen.queen-cake {
+    background-image: url('../assets/queens/cake.png');
+}
+
+.card.type-queen.queen-cat {
+    background-image: url('../assets/queens/cat.png');
+}
+
+.card.type-queen.queen-dog {
+    background-image: url('../assets/queens/dog.png');
+}
+
+.card.type-queen.queen-heart {
+    background-image: url('../assets/queens/heart.png');
+}
+
+.card.type-queen.queen-ice-cream {
+    background-image: url('../assets/queens/ice-cream.png');
+}
+
+.card.type-queen.queen-ladybug {
+    background-image: url('../assets/queens/ladybug.png');
+}
+
+.card.type-queen.queen-sunflower {
+    background-image: url('../assets/queens/sunflower.png');
+}
+
+.card.type-queen.queen-moon {
+    background-image: url('../assets/queens/moon.png');
+}
+
+.card.type-queen.queen-pancake {
+    background-image: url('../assets/queens/pancake.png');
+}
+
+.card.type-queen.queen-peacock {
+    background-image: url('../assets/queens/peacock.png');
+}
+
+.card.type-queen.queen-rainbow {
+    background-image: url('../assets/queens/rainbow.png');
+}
+
+.card.type-queen.queen-rose {
+    background-image: url('../assets/queens/rose.png');
+}
+
+.card.type-queen.queen-starfish {
+    background-image: url('../assets/queens/starfish.png');
+}
+
+.card.type-queen.queen-strawberry {
+    background-image: url('../assets/queens/strawberry.png');
+}

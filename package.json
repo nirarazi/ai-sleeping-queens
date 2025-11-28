@@ -1,0 +1,30 @@
+{
+  "name": "sleeping-queens-online",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=@sq/server",
+    "dev:client": "npm run dev --workspace=@sq/client",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,magenta\" \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "npm run build --workspaces",
+    "preview": "npm run preview --workspace=@sq/client",
+    "start": "npm run build --workspaces && npm run start:prod --workspace=@sq/server",
+    "test:client": "npm run test --workspace=@sq/client",
+    "test:server": "npm run test --workspace=@sq/server",
+    "test": "npm run test --workspaces"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-legacy": "^4.1.1",
+    "concurrently": "^9.2.1",
+    "sharp": "^0.34.5",
+    "terser": "^5.44.1"
+  },
+  "dependencies": {
+    "i18next": "^25.6.3",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "react-i18next": "^16.3.4"
+  }
+}
