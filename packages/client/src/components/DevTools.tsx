@@ -70,7 +70,7 @@ export const DevTools: React.FC<DevToolsProps> = ({ onDebugCommand }) => {
         <div style={{ borderTop: '1px solid #555', paddingTop: '10px' }}>
             <label style={{ display: 'block', marginBottom: '5px', fontSize: '12px', color: '#ccc' }}>Give Card</label>
             <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                {Object.values(CardType).map(type => (
+                {(Object.values(CardType) as string[]).map(type => (
                     <button key={type} onClick={() => onDebugCommand({ type: 'GIVE_CARD', payload: { cardType: type } })} style={{ fontSize: '10px' }}>
                         {type}
                     </button>

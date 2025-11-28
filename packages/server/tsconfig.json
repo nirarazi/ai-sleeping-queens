@@ -3,10 +3,13 @@
     "target": "ES2020",
     "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "..",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@sq/shared": ["../shared/src/index.ts"]
+    }
   },
   "include": ["src/**/*"]
 }

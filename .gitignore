@@ -40,3 +40,10 @@ split_queens.js
 # TypeScript
 *.tsbuildinfo
 
+# Compiled Source
+packages/shared/src/*.js
+packages/shared/src/*.js.map
+packages/server/src/*.js
+packages/server/src/*.js.map
+packages/client/src/*.js
+packages/client/src/*.js.map
