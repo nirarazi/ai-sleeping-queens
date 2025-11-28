@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
     socket.emit(SocketEvents.AVAILABLE_ROOMS_UPDATE, roomManager.getAvailableRooms());
   });
 
-  socket.on(SocketEvents.CREATE_ROOM, ({ playerName, userId }, callback) => {
+  socket.on(SocketEvents.CREATE_ROOM, ({ playerName, userId }: { playerName: string, userId: string }, callback: (roomId: string) => void) => {
     const roomId = roomManager.createRoom();
     try {
       const game = roomManager.joinRoom(roomId, userId, playerName, socket.id);
@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on(SocketEvents.JOIN_ROOM, ({ roomId, playerName, userId }) => {
+  socket.on(SocketEvents.JOIN_ROOM, ({ roomId, playerName, userId }: { roomId: string, playerName: string, userId: string }) => {
     try {
       const game = roomManager.joinRoom(roomId, userId, playerName, socket.id);
       socket.join(roomId);
@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on(SocketEvents.LEAVE_ROOM, ({ roomId }) => {
+  socket.on(SocketEvents.LEAVE_ROOM, ({ roomId }: { roomId: string }) => {
       const game = roomManager.leaveRoom(roomId, socket.id);
       socket.leave(roomId);
       
@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
       broadcastRoomList();
   });
 
-  socket.on(SocketEvents.PLAY_ACTION, ({ roomId, action }) => {
+  socket.on(SocketEvents.PLAY_ACTION, ({ roomId, action }: { roomId: string, action: any }) => {
     logger.info("Received play_action", { roomId, action });
     const game = roomManager.getGame(roomId);
     if (!game) {
@@ -142,7 +142,7 @@ io.on('connection', (socket) => {
       }
   });
 
-  socket.on(SocketEvents.DEBUG_COMMAND, ({ roomId, command }) => {
+  socket.on(SocketEvents.DEBUG_COMMAND, ({ roomId, command }: { roomId: string, command: any }) => {
       logger.info("Received debug command", { roomId, command });
       const game = roomManager.getGame(roomId);
       if (game) {
