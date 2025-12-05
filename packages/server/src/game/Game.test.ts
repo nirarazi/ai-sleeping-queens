@@ -99,7 +99,8 @@ describe('Game Logic', () => {
 
     test('should play King to wake a queen', () => {
       const king = giveCard(p1, CardType.KING, 'Test King');
-      const targetQueen = game.queens.find(q => !q.isAwake)!;
+      // Pick a safe queen (Cake Queen) to avoid Rose Queen bonus turn
+      const targetQueen = game.queens.find(q => q.name === 'Cake Queen')!;
 
       game.handleAction({
         type: 'PLAY_CARD',
