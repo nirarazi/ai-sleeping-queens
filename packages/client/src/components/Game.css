@@ -1088,6 +1088,9 @@ body>.app-container>.language-switcher,
         display: flex;
         flex-direction: column;
         height: 100vh;
+        /* Fallback for older browsers */
+        height: -webkit-fill-available;
+        /* Fallback for Safari */
         height: 100dvh;
         /* Dynamic viewport height for mobile browsers */
         padding: 0;
@@ -1551,9 +1554,7 @@ body>.app-container>.language-switcher,
 
 /* Extra small devices (phones in portrait, less than 400px) */
 @media (max-width: 400px) {
-    .game-room {
-        padding: 3px;
-    }
+    /* No padding on game-room to maintain edge-to-edge fixed header/footer layout */
 
     .header {
         padding: 5px;
@@ -1625,25 +1626,27 @@ body>.app-container>.language-switcher,
     .game-room {
         flex-direction: row;
         height: 100vh;
+        height: -webkit-fill-available;
         height: 100dvh;
     }
 
     /* Left side: Game board */
-    .header,
+    .header {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        position: static;
+        padding: 4px;
+        border-bottom: none;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     .opponents,
     .queens-grid {
         flex: 1;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
-    }
-
-    .header {
-        position: static;
-        flex: 0 0 auto;
-        padding: 4px;
-        border-bottom: none;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .opponents {
@@ -1707,6 +1710,7 @@ body>.app-container>.language-switcher,
         display: flex;
         flex-direction: column;
         height: 100vh;
+        height: -webkit-fill-available;
         height: 100dvh;
         padding: 0;
         overflow: hidden;
@@ -1821,6 +1825,7 @@ body>.app-container>.language-switcher,
         grid-template-columns: 1fr 400px;
         grid-template-rows: auto 1fr;
         height: 100vh;
+        height: -webkit-fill-available;
         height: 100dvh;
         padding: 0;
         overflow: hidden;
