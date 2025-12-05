@@ -28,42 +28,42 @@ export class Game {
     this.deck = new Deck();
     this.createdAt = Date.now();
     this.onStateChange = onStateChange;
-    
+
     this.turnDurationMs = 60000; // Default
     if (options) {
-        this.updateSettings(options);
+      this.updateSettings(options);
     }
 
     this.initializeQueens();
   }
 
   public updateSettings(options: CreateRoomOptions, requestingPlayerId?: string) {
-      console.log('Game.updateSettings called', { options, requestingPlayerId, hostId: this.hostId });
-      if (requestingPlayerId && requestingPlayerId !== this.hostId) {
-          console.error('Host ID mismatch', { expected: this.hostId, received: requestingPlayerId });
-          throw new Error('Only host can update settings');
-      }
-      if (options.turnTimeLimit) {
-          const limit = options.turnTimeLimit;
-          const clampedLimit = Math.max(5, Math.min(60, limit));
-          this.turnDurationMs = clampedLimit * 1000;
-          console.log('Turn duration updated to', this.turnDurationMs);
-      }
+    console.log('Game.updateSettings called', { options, requestingPlayerId, hostId: this.hostId });
+    if (requestingPlayerId && requestingPlayerId !== this.hostId) {
+      console.error('Host ID mismatch', { expected: this.hostId, received: requestingPlayerId });
+      throw new Error('Only host can update settings');
+    }
+    if (options.turnTimeLimit) {
+      const limit = options.turnTimeLimit;
+      const clampedLimit = Math.max(5, Math.min(60, limit));
+      this.turnDurationMs = clampedLimit * 1000;
+      console.log('Turn duration updated to', this.turnDurationMs);
+    }
   }
 
   private startTurnTimer() {
     this.clearTurnTimer();
     this.turnDeadline = Date.now() + this.turnDurationMs;
-    
+
     this.turnTimer = setTimeout(() => {
-        this.handleTurnTimeout();
+      this.handleTurnTimeout();
     }, this.turnDurationMs);
   }
 
   private clearTurnTimer() {
     if (this.turnTimer) {
-        clearTimeout(this.turnTimer);
-        this.turnTimer = null;
+      clearTimeout(this.turnTimer);
+      this.turnTimer = null;
     }
     this.turnDeadline = undefined;
   }
@@ -71,99 +71,101 @@ export class Game {
   private handleTurnTimeout() {
     const currentPlayer = this.players[this.currentTurnIndex];
     if (currentPlayer) {
-        console.log(`Turn timeout for player ${currentPlayer.name}`);
-        // Force end turn
-        this.endTurn(currentPlayer);
-        // Notify state change
-        if (this.onStateChange) {
-            this.onStateChange(this.getState());
-        }
+      console.log(`Turn timeout for player ${currentPlayer.name}`);
+      // Clear any pending queen selection to prevent invalid state
+      this.pendingQueenSelection = undefined;
+      // Force end turn
+      this.endTurn(currentPlayer);
+      // Notify state change
+      if (this.onStateChange) {
+        this.onStateChange(this.getState());
+      }
     }
   }
 
   public handleDebugCommand(command: DebugCommand) {
-      switch (command.type) {
-          case 'SET_GAME_STATUS':
-              this.status = command.payload.status;
-              if (this.status === GameStatus.FINISHED && !this.winnerId && this.players.length > 0) {
-                  this.winnerId = this.players[0].id;
-                  this.clearTurnTimer();
-              }
-              if (this.status === GameStatus.PLAYING && this.players.length >= 2 && this.deck.count === 52) {
-                   this.startGame();
-              }
-              break;
-          case 'RESET_GAME':
-              this.resetGame();
-              break;
-          case 'GIVE_CARD':
-              this.giveDebugCard(command.payload.cardType);
-              break;
-          case 'SWITCH_TURN':
-              if (this.players.length > 0) {
-                  this.endTurn(this.players[this.currentTurnIndex]);
-              }
-              break;
-          case 'WAKE_ALL_QUEENS':
-               this.wakeAllQueens();
-               break;
-          case 'SLEEP_ALL_QUEENS':
-               this.sleepAllQueens();
-               break;
-      }
+    switch (command.type) {
+      case 'SET_GAME_STATUS':
+        this.status = command.payload.status;
+        if (this.status === GameStatus.FINISHED && !this.winnerId && this.players.length > 0) {
+          this.winnerId = this.players[0].id;
+          this.clearTurnTimer();
+        }
+        if (this.status === GameStatus.PLAYING && this.players.length >= 2 && this.deck.count === 52) {
+          this.startGame();
+        }
+        break;
+      case 'RESET_GAME':
+        this.resetGame();
+        break;
+      case 'GIVE_CARD':
+        this.giveDebugCard(command.payload.cardType);
+        break;
+      case 'SWITCH_TURN':
+        if (this.players.length > 0) {
+          this.endTurn(this.players[this.currentTurnIndex]);
+        }
+        break;
+      case 'WAKE_ALL_QUEENS':
+        this.wakeAllQueens();
+        break;
+      case 'SLEEP_ALL_QUEENS':
+        this.sleepAllQueens();
+        break;
+    }
   }
 
   private resetGame() {
-      this.clearTurnTimer();
-      this.status = GameStatus.LOBBY;
-      this.deck = new Deck();
-      this.initializeQueens();
-      this.discardPile = [];
-      this.winnerId = undefined;
-      this.lastAction = undefined;
-      this.pendingQueenSelection = undefined;
-      this.currentTurnIndex = 0;
-      this.players.forEach(p => {
-          p.hand = [];
-          p.awokenQueens = [];
-      });
+    this.clearTurnTimer();
+    this.status = GameStatus.LOBBY;
+    this.deck = new Deck();
+    this.initializeQueens();
+    this.discardPile = [];
+    this.winnerId = undefined;
+    this.lastAction = undefined;
+    this.pendingQueenSelection = undefined;
+    this.currentTurnIndex = 0;
+    this.players.forEach(p => {
+      p.hand = [];
+      p.awokenQueens = [];
+    });
   }
 
   private giveDebugCard(type: CardType) {
-      const player = this.players[this.currentTurnIndex];
-      if (!player) return;
-      
-      const newCard: Card = {
-          id: uuidv4(),
-          type: type,
-          name: 'Debug ' + type,
-          value: type === CardType.NUMBER ? 5 : undefined
-      };
-      player.addCard(newCard);
+    const player = this.players[this.currentTurnIndex];
+    if (!player) return;
+
+    const newCard: Card = {
+      id: uuidv4(),
+      type: type,
+      name: 'Debug ' + type,
+      value: type === CardType.NUMBER ? 5 : undefined
+    };
+    player.addCard(newCard);
   }
 
   private wakeAllQueens() {
-      const player = this.players[this.currentTurnIndex];
-      if (!player) return;
-      this.queens.forEach(q => {
-          if (!q.isAwake) {
-               // Bypassing constraints for debug
-               player.wakeQueen(q);
-          }
-      });
+    const player = this.players[this.currentTurnIndex];
+    if (!player) return;
+    this.queens.forEach(q => {
+      if (!q.isAwake) {
+        // Bypassing constraints for debug
+        player.wakeQueen(q);
+      }
+    });
   }
 
   private sleepAllQueens() {
-      this.queens.forEach(q => {
-          if(q.isAwake && q.ownerId) {
-              const owner = this.players.find(p => p.id === q.ownerId);
-              if(owner) {
-                  owner.looseQueen(q.id);
-              }
-              q.isAwake = false;
-              q.ownerId = undefined;
-          }
-      });
+    this.queens.forEach(q => {
+      if (q.isAwake && q.ownerId) {
+        const owner = this.players.find(p => p.id === q.ownerId);
+        if (owner) {
+          owner.looseQueen(q.id);
+        }
+        q.isAwake = false;
+        q.ownerId = undefined;
+      }
+    });
   }
 
   private initializeQueens() {
@@ -182,7 +184,7 @@ export class Game {
 
   public addPlayer(id: string, name: string, socketId: string): Player {
     if (this.status !== GameStatus.LOBBY && this.status !== GameStatus.PLAYING) {
-       // ...
+      // ...
     }
     if (this.status !== GameStatus.LOBBY) {
       throw new Error('Game already started');
@@ -190,11 +192,11 @@ export class Game {
     if (this.players.length >= 5) {
       throw new Error('Game is full');
     }
-    
+
     // First player is host, or if hostId is missing
     if (this.players.length === 0 || !this.hostId) {
-        this.hostId = id;
-        console.log(`Host set to player ${id} (${name})`);
+      this.hostId = id;
+      console.log(`Host set to player ${id} (${name})`);
     }
 
     const player = new Player(id, name, socketId);
@@ -204,44 +206,44 @@ export class Game {
 
   public removePlayer(id: string) {
     this.players = this.players.filter(p => p.id !== id);
-    
+
     // If host leaves, assign new host
     if (id === this.hostId && this.players.length > 0) {
-        this.hostId = this.players[0].id;
-        console.log(`Host left, new host is ${this.hostId}`);
+      this.hostId = this.players[0].id;
+      console.log(`Host left, new host is ${this.hostId}`);
     }
-    
+
     if (this.status === GameStatus.PLAYING && this.players.length < 2) {
-        this.resetGame();
+      this.resetGame();
     }
   }
 
   public disconnectPlayer(socketId: string) {
-      const player = this.players.find(p => p.socketId === socketId);
-      if (player) {
-          player.isConnected = false;
-      }
+    const player = this.players.find(p => p.socketId === socketId);
+    if (player) {
+      player.isConnected = false;
+    }
   }
 
   public playerReconnected(userId: string, socketId: string) {
-      const player = this.players.find(p => p.id === userId);
-      if (player) {
-          player.isConnected = true;
-          player.socketId = socketId;
-          
-          // Resume timer if it's this player's turn and timer is stopped
-          const currentPlayer = this.players[this.currentTurnIndex];
-          if (this.status === GameStatus.PLAYING && 
-              !this.winnerId && 
-              currentPlayer?.id === player.id && 
-              !this.turnTimer) {
-              this.startTurnTimer();
-          }
+    const player = this.players.find(p => p.id === userId);
+    if (player) {
+      player.isConnected = true;
+      player.socketId = socketId;
 
-          if (this.onStateChange) {
-              this.onStateChange(this.getState());
-          }
+      // Resume timer if it's this player's turn and timer is stopped
+      const currentPlayer = this.players[this.currentTurnIndex];
+      if (this.status === GameStatus.PLAYING &&
+        !this.winnerId &&
+        currentPlayer?.id === player.id &&
+        !this.turnTimer) {
+        this.startTurnTimer();
       }
+
+      if (this.onStateChange) {
+        this.onStateChange(this.getState());
+      }
+    }
   }
 
   public startGame() {
@@ -250,7 +252,7 @@ export class Game {
     }
     this.status = GameStatus.PLAYING;
     this.deck.shuffle();
-    
+
     // Deal 5 cards to each player
     this.players.forEach(player => {
       for (let i = 0; i < 5; i++) {
@@ -270,14 +272,14 @@ export class Game {
   public handleAction(action: GameAction) {
     const player = this.players.find(p => p.id === action.playerId);
     if (!player) throw new Error('Player not found');
-    
+
     // Check if we are waiting for a queen selection
-    const isQueenSelectionAction = this.pendingQueenSelection && 
-                                   action.type === 'WAKE_QUEEN' && 
-                                   this.pendingQueenSelection.playerId === player.id;
+    const isQueenSelectionAction = this.pendingQueenSelection &&
+      action.type === 'WAKE_QUEEN' &&
+      this.pendingQueenSelection.playerId === player.id;
 
     if (this.pendingQueenSelection && !isQueenSelectionAction) {
-        throw new Error('Waiting for queen selection');
+      throw new Error('Waiting for queen selection');
     }
 
     const currentPlayer = this.players[this.currentTurnIndex];
@@ -293,24 +295,24 @@ export class Game {
     if (!enrichedAction.payload) enrichedAction.payload = {};
 
     if (enrichedAction.type === 'PLAY_CARD' && enrichedAction.payload.cardId) {
-        const card = player.hand.find(c => c.id === enrichedAction.payload.cardId);
-        if (card) {
-            enrichedAction.payload.cardType = card.type;
-            enrichedAction.payload.cardName = card.name;
-        }
-        if (enrichedAction.payload.targetQueenId) {
-            const queen = this.queens.find(q => q.id === enrichedAction.payload.targetQueenId);
-            if (queen) enrichedAction.payload.targetQueenName = queen.name;
-        }
-        if (enrichedAction.payload.targetPlayerId) {
-             const target = this.players.find(p => p.id === enrichedAction.payload.targetPlayerId);
-             if (target) enrichedAction.payload.targetPlayerName = target.name;
-        }
+      const card = player.hand.find(c => c.id === enrichedAction.payload.cardId);
+      if (card) {
+        enrichedAction.payload.cardType = card.type;
+        enrichedAction.payload.cardName = card.name;
+      }
+      if (enrichedAction.payload.targetQueenId) {
+        const queen = this.queens.find(q => q.id === enrichedAction.payload.targetQueenId);
+        if (queen) enrichedAction.payload.targetQueenName = queen.name;
+      }
+      if (enrichedAction.payload.targetPlayerId) {
+        const target = this.players.find(p => p.id === enrichedAction.payload.targetPlayerId);
+        if (target) enrichedAction.payload.targetPlayerName = target.name;
+      }
     } else if (enrichedAction.type === 'DISCARD' && enrichedAction.payload.cardIds) {
-        enrichedAction.payload.count = enrichedAction.payload.cardIds.length;
+      enrichedAction.payload.count = enrichedAction.payload.cardIds.length;
     } else if (enrichedAction.type === 'WAKE_QUEEN' && enrichedAction.payload.targetQueenId) {
-         const queen = this.queens.find(q => q.id === enrichedAction.payload.targetQueenId);
-         if (queen) enrichedAction.payload.targetQueenName = queen.name;
+      const queen = this.queens.find(q => q.id === enrichedAction.payload.targetQueenId);
+      if (queen) enrichedAction.payload.targetQueenName = queen.name;
     }
 
     switch (action.type) {
@@ -337,7 +339,7 @@ export class Game {
     // Payload expected: { cardId: string, targetPlayerId?: string, targetQueenId?: string, discardCardIds?: string[] }
     const { cardId, targetPlayerId, targetQueenId } = payload;
     const card = player.hand.find(c => c.id === cardId);
-    
+
     if (!card) throw new Error('Card not in hand');
 
     let shouldEndTurn = true;
@@ -357,8 +359,8 @@ export class Game {
         shouldEndTurn = this.playJester(player, card);
         break;
       case CardType.NUMBER:
-         // Usually numbers are just discarded to draw new ones
-         throw new Error('Use DISCARD action for numbers');
+        // Usually numbers are just discarded to draw new ones
+        throw new Error('Use DISCARD action for numbers');
       default:
         // Wands and Dragons are reaction cards, not played proactively usually
         // But if someone tries to play them?
@@ -368,28 +370,28 @@ export class Game {
     // End turn logic (draw back to 5)
     // Only end turn if we are NOT waiting for selection (Jester might trigger it)
     if (shouldEndTurn && !this.pendingQueenSelection) {
-        this.endTurn(player);
+      this.endTurn(player);
     }
   }
 
   private addPendingPick(playerId: string, count: number) {
-      // Reset timer when pending pick occurs? 
-      // Or maybe keep the same timer?
-      // If Jester reveals number, player has to pick. Should we restart timer for the PICKER?
-      // The requirement is "turn is lost and moves to next player" if time passes.
-      // If waiting for pick, the turn is technically on the picker.
-      
-      // If pending selection changes the active player (Jester number card), we should restart timer for that player.
-      // Logic in playJester handles waiting.
-      // When pending selection is set, we should restart timer if the player changed.
+    // Reset timer when pending pick occurs? 
+    // Or maybe keep the same timer?
+    // If Jester reveals number, player has to pick. Should we restart timer for the PICKER?
+    // The requirement is "turn is lost and moves to next player" if time passes.
+    // If waiting for pick, the turn is technically on the picker.
 
-      if (this.pendingQueenSelection && this.pendingQueenSelection.playerId === playerId) {
-          this.pendingQueenSelection.picksRemaining = (this.pendingQueenSelection.picksRemaining || 0) + count;
-      } else {
-          this.pendingQueenSelection = { playerId, picksRemaining: count };
-          // Restart timer for the player who now has to pick
-          this.startTurnTimer();
-      }
+    // If pending selection changes the active player (Jester number card), we should restart timer for that player.
+    // Logic in playJester handles waiting.
+    // When pending selection is set, we should restart timer if the player changed.
+
+    if (this.pendingQueenSelection && this.pendingQueenSelection.playerId === playerId) {
+      this.pendingQueenSelection.picksRemaining = (this.pendingQueenSelection.picksRemaining || 0) + count;
+    } else {
+      this.pendingQueenSelection = { playerId, picksRemaining: count };
+      // Restart timer for the player who now has to pick
+      this.startTurnTimer();
+    }
   }
 
   private handleQueenWakeEffects(player: Player, queen: Queen) {
@@ -401,12 +403,12 @@ export class Game {
     const isDog = queen.name.includes('Dog');
 
     if ((isCat && hasDog) || (isDog && hasCat)) {
-         // Blocked logic: Queen stays where it is (sleeping)
-         // Turn ends
-         // We might want to signal this failure via an event or just not update the queen
-         queen.isAwake = false;
-         queen.ownerId = undefined;
-         return;
+      // Blocked logic: Queen stays where it is (sleeping)
+      // Turn ends
+      // We might want to signal this failure via an event or just not update the queen
+      queen.isAwake = false;
+      queen.ownerId = undefined;
+      return;
     }
 
     // Proceed with wake
@@ -414,32 +416,32 @@ export class Game {
 
     // Handle Rose Queen ability (wake another)
     if (queen.name === 'Rose Queen') {
-        const anySleeping = this.queens.some(q => !q.isAwake && q.id !== queen.id);
-        if (anySleeping) {
-            this.addPendingPick(player.id, 1);
-        }
+      const anySleeping = this.queens.some(q => !q.isAwake && q.id !== queen.id);
+      if (anySleeping) {
+        this.addPendingPick(player.id, 1);
+      }
     }
   }
 
   private playKing(player: Player, card: Card, targetQueenId?: string) {
-    if (!targetQueenId) { 
-       throw new Error('Must select a queen');
+    if (!targetQueenId) {
+      throw new Error('Must select a queen');
     }
-    
+
     const queen = this.queens.find(q => q.id === targetQueenId && !q.isAwake);
     if (!queen) throw new Error('Queen not available');
 
     this.discardCard(player, card.id);
 
-     // Handle Tie-Dye King (wake 2 queens)
+    // Handle Tie-Dye King (wake 2 queens)
     if (card.name === 'tie-dye') {
-        const anyOtherSleeping = this.queens.some(q => !q.isAwake && q.id !== queen.id);
-        if (anyOtherSleeping) {
-            this.addPendingPick(player.id, 1);
-        }
+      const anyOtherSleeping = this.queens.some(q => !q.isAwake && q.id !== queen.id);
+      if (anyOtherSleeping) {
+        this.addPendingPick(player.id, 1);
+      }
     } else {
-        // Only for debugging: log if card name is mismatched
-        console.log(`Playing King: ${card.name}`);
+      // Only for debugging: log if card name is mismatched
+      console.log(`Playing King: ${card.name}`);
     }
 
     this.handleQueenWakeEffects(player, queen);
@@ -449,14 +451,14 @@ export class Game {
     if (!targetPlayerId || !targetQueenId) throw new Error('Target required');
     const targetPlayer = this.players.find(p => p.id === targetPlayerId);
     if (!targetPlayer) throw new Error('Target player not found');
-    
+
     if (!targetPlayer.hasQueen(this.queens.find(q => q.id === targetQueenId)?.name || '')) {
-        throw new Error('Target player does not have that queen');
+      throw new Error('Target player does not have that queen');
     }
 
     const targetQueen = this.queens.find(q => q.id === targetQueenId);
     if (targetQueen?.name === 'Strawberry Queen') {
-        throw new Error('Strawberry Queen cannot be stolen');
+      throw new Error('Strawberry Queen cannot be stolen');
     }
 
     this.discardCard(player, card.id);
@@ -464,10 +466,10 @@ export class Game {
     // Check for Dragon
     const dragonCard = targetPlayer.hand.find(c => c.type === CardType.DRAGON);
     if (dragonCard) {
-        // Blocked!
-        this.discardCard(targetPlayer, dragonCard.id);
-        this.drawCard(targetPlayer); // Defender refills hand immediately? Rules say yes.
-        return; // Action failed
+      // Blocked!
+      this.discardCard(targetPlayer, dragonCard.id);
+      this.drawCard(targetPlayer); // Defender refills hand immediately? Rules say yes.
+      return; // Action failed
     }
 
     // Steal Queen Logic
@@ -481,17 +483,17 @@ export class Game {
     const isDog = queenToSteal.name.includes('Dog');
 
     if ((isCat && hasDog) || (isDog && hasCat)) {
-         // Conflict! Attack succeeds (Knight discarded, Dragon not used), but Queen stays with OWNER.
-         // Effectively the attack is wasted.
-         // OR does it go back to sleep? Rules say "you cannot hold both". Usually means you can't take it.
-         // We'll say attack fails to take the card.
-         return;
+      // Conflict! Attack succeeds (Knight discarded, Dragon not used), but Queen stays with OWNER.
+      // Effectively the attack is wasted.
+      // OR does it go back to sleep? Rules say "you cannot hold both". Usually means you can't take it.
+      // We'll say attack fails to take the card.
+      return;
     }
 
     // Success
     const queen = targetPlayer.looseQueen(targetQueenId);
     if (queen) {
-        player.wakeQueen(queen);
+      player.wakeQueen(queen);
     }
   }
 
@@ -504,7 +506,7 @@ export class Game {
     if (!queen || !targetPlayer.hasQueen(queen.name)) throw new Error('Target does not have queen');
 
     if (queen.name === 'Strawberry Queen') {
-        throw new Error('Strawberry Queen cannot be put to sleep');
+      throw new Error('Strawberry Queen cannot be put to sleep');
     }
 
     this.discardCard(player, card.id);
@@ -512,81 +514,81 @@ export class Game {
     // Check for Wand
     const wandCard = targetPlayer.hand.find(c => c.type === CardType.WAND);
     if (wandCard) {
-        // Blocked!
-        this.discardCard(targetPlayer, wandCard.id);
-        this.drawCard(targetPlayer);
-        return;
+      // Blocked!
+      this.discardCard(targetPlayer, wandCard.id);
+      this.drawCard(targetPlayer);
+      return;
     }
 
     // Sleep Queen
     const lostQueen = targetPlayer.looseQueen(targetQueenId);
     if (lostQueen) {
-        lostQueen.isAwake = false;
-        lostQueen.ownerId = undefined;
-        // Return to center (should be logically handled by just removing ownerId and isAwake=false)
+      lostQueen.isAwake = false;
+      lostQueen.ownerId = undefined;
+      // Return to center (should be logically handled by just removing ownerId and isAwake=false)
     }
   }
 
   private playJester(player: Player, card: Card): boolean {
     this.discardCard(player, card.id);
-    
-    while (true) {
-        const revealedCard = this.deck.draw();
-        if (!revealedCard) {
-            this.reshuffleDiscard();
-            if (this.deck.count === 0) return true;
-            continue;
-        }
-        
-        // Reveal logic would emit event usually. Here we just process result.
 
-        if (revealedCard.type !== CardType.NUMBER) {
-            player.addCard(revealedCard);
-            // No turn end.
-            return false;
-        } else {
-            this.discardPile.push(revealedCard); 
-            // Number card
-            const count = revealedCard.value || 0;
-            // Count around the table
-            const targetIndex = (this.currentTurnIndex + (count - 1)) % this.players.length; 
-            
-            const targetPlayer = this.players[targetIndex];
-            if (!targetPlayer) return true; // Should not happen
-            
-            // Set state to waiting for queen selection
-            // This calls addPendingPick which restarts timer for targetPlayer
-            this.addPendingPick(targetPlayer.id, 1);
-            return true;
-        }
+    while (true) {
+      const revealedCard = this.deck.draw();
+      if (!revealedCard) {
+        this.reshuffleDiscard();
+        if (this.deck.count === 0) return true;
+        continue;
+      }
+
+      // Reveal logic would emit event usually. Here we just process result.
+
+      if (revealedCard.type !== CardType.NUMBER) {
+        player.addCard(revealedCard);
+        // No turn end.
+        return false;
+      } else {
+        this.discardPile.push(revealedCard);
+        // Number card
+        const count = revealedCard.value || 0;
+        // Count around the table
+        const targetIndex = (this.currentTurnIndex + (count - 1)) % this.players.length;
+
+        const targetPlayer = this.players[targetIndex];
+        if (!targetPlayer) return true; // Should not happen
+
+        // Set state to waiting for queen selection
+        // This calls addPendingPick which restarts timer for targetPlayer
+        this.addPendingPick(targetPlayer.id, 1);
+        return true;
+      }
     }
   }
 
   private resolveWakeQueen(player: Player, payload: any) {
-     if (!this.pendingQueenSelection) throw new Error('No pending queen selection');
-     if (this.pendingQueenSelection.playerId !== player.id) throw new Error('Not your turn to pick a queen');
-     
-     const { targetQueenId } = payload;
-     if (!targetQueenId) throw new Error('Must select a queen');
+    if (!this.pendingQueenSelection) throw new Error('No pending queen selection');
+    if (this.pendingQueenSelection.playerId !== player.id) throw new Error('Not your turn to pick a queen');
 
-     const queen = this.queens.find(q => q.id === targetQueenId && !q.isAwake);
-     if (!queen) throw new Error('Queen not available');
+    const { targetQueenId } = payload;
+    if (!targetQueenId) throw new Error('Must select a queen');
 
-     // Decrement picks
-     if (this.pendingQueenSelection.picksRemaining && this.pendingQueenSelection.picksRemaining > 0) {
-         this.pendingQueenSelection.picksRemaining--;
-     }
+    const queen = this.queens.find(q => q.id === targetQueenId && !q.isAwake);
+    if (!queen) throw new Error('Queen not available');
 
-     // Use shared logic
-     this.handleQueenWakeEffects(player, queen);
-     
-     // Check if done
-     if (!this.pendingQueenSelection || !this.pendingQueenSelection.picksRemaining || this.pendingQueenSelection.picksRemaining <= 0) {
-         this.pendingQueenSelection = undefined;
-         // End turn of the ORIGINAL player.
-         const originalPlayer = this.players[this.currentTurnIndex];
-         this.endTurn(originalPlayer);
-     }
+    // Decrement picks
+    if (this.pendingQueenSelection.picksRemaining && this.pendingQueenSelection.picksRemaining > 0) {
+      this.pendingQueenSelection.picksRemaining--;
+    }
+
+    // Use shared logic
+    this.handleQueenWakeEffects(player, queen);
+
+    // Check if done
+    if (!this.pendingQueenSelection || !this.pendingQueenSelection.picksRemaining || this.pendingQueenSelection.picksRemaining <= 0) {
+      this.pendingQueenSelection = undefined;
+      // End turn of the ORIGINAL player.
+      const originalPlayer = this.players[this.currentTurnIndex];
+      this.endTurn(originalPlayer);
+    }
   }
 
   private resolveDiscard(player: Player, payload: any) {
@@ -603,30 +605,30 @@ export class Game {
     const numbers = (cards as Card[]).map(c => c.value || 0).sort((a, b) => a - b);
     console.log("Discard numbers:", numbers);
     let isValid = false;
-    
-    if (cards.length === 1) isValid = true; 
+
+    if (cards.length === 1) isValid = true;
     else {
-        // Check if cards can be partitioned into two sets with equal sums
-        // This supports:
-        // 1. Pairs: 5, 5 -> 5=5 (Sum=10, target=5)
-        // 2. Simple addition: 2, 3, 5 -> 2+3=5 (Sum=10, target=5)
-        // 3. Complex equations: 3, 4, 5, 6 -> 3+6=4+5 (Sum=18, target=9)
-        const sum = numbers.reduce((a, b) => a + b, 0);
-        if (sum % 2 === 0) {
-            const target = sum / 2;
-            isValid = this.canSubsetSum(numbers, target);
-        }
+      // Check if cards can be partitioned into two sets with equal sums
+      // This supports:
+      // 1. Pairs: 5, 5 -> 5=5 (Sum=10, target=5)
+      // 2. Simple addition: 2, 3, 5 -> 2+3=5 (Sum=10, target=5)
+      // 3. Complex equations: 3, 4, 5, 6 -> 3+6=4+5 (Sum=18, target=9)
+      const sum = numbers.reduce((a, b) => a + b, 0);
+      if (sum % 2 === 0) {
+        const target = sum / 2;
+        isValid = this.canSubsetSum(numbers, target);
+      }
     }
 
     if (!isValid) throw new Error('Invalid discard combination');
 
     // Discard and Draw
     cardIds.forEach(id => this.discardCard(player, id));
-    
+
     // Draw back up to 5? 
     // Rule: Draw equal number of cards discarded.
     for (let i = 0; i < cardIds.length; i++) {
-        this.drawCard(player);
+      this.drawCard(player);
     }
 
     this.endTurn(player);
@@ -635,17 +637,17 @@ export class Game {
   private canSubsetSum(numbers: number[], target: number): boolean {
     // Simple subset sum implementation using dynamic programming
     const possibleSums = new Set<number>([0]);
-    
+
     for (const num of numbers) {
-        const newSums = new Array<number>();
-        for (const sum of possibleSums) {
-            const currentSum = sum + num;
-            if (currentSum === target) return true;
-            if (currentSum < target) newSums.push(currentSum);
-        }
-        newSums.forEach(s => possibleSums.add(s));
+      const newSums = new Array<number>();
+      for (const sum of possibleSums) {
+        const currentSum = sum + num;
+        if (currentSum === target) return true;
+        if (currentSum < target) newSums.push(currentSum);
+      }
+      newSums.forEach(s => possibleSums.add(s));
     }
-    
+
     return possibleSums.has(target);
   }
 
@@ -672,8 +674,8 @@ export class Game {
 
     // Draw up to 5 cards if hand is low
     while (player.hand.length < 5) {
-        this.drawCard(player);
-        if (this.deck.count === 0 && this.discardPile.length === 0) break;
+      this.drawCard(player);
+      if (this.deck.count === 0 && this.discardPile.length === 0) break;
     }
 
     if (this.players.length === 0) return;
@@ -681,14 +683,14 @@ export class Game {
     // Skip disconnected players
     let attempts = 0;
     do {
-        this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
-        attempts++;
+      this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
+      attempts++;
     } while (this.players[this.currentTurnIndex] && !this.players[this.currentTurnIndex].isConnected && attempts < this.players.length);
 
     // Start next turn timer
     const nextPlayer = this.players[this.currentTurnIndex];
     if (this.status === GameStatus.PLAYING && !this.winnerId && nextPlayer?.isConnected) {
-        this.startTurnTimer();
+      this.startTurnTimer();
     }
   }
 
@@ -697,19 +699,19 @@ export class Game {
     const pointsToWin = playerCount >= 4 ? 40 : 50;
     const queensToWin = playerCount >= 4 ? 4 : 5;
 
-    const winner = this.players.find(p => 
-        p.score >= pointsToWin || p.awokenQueens.length >= queensToWin
+    const winner = this.players.find(p =>
+      p.score >= pointsToWin || p.awokenQueens.length >= queensToWin
     );
 
     if (winner) {
-        this.status = GameStatus.FINISHED;
-        this.winnerId = winner.id;
-        this.clearTurnTimer();
+      this.status = GameStatus.FINISHED;
+      this.winnerId = winner.id;
+      this.clearTurnTimer();
     } else if (this.queens.every(q => q.isAwake)) {
-        const sorted = [...this.players].sort((a, b) => b.score - a.score);
-        this.status = GameStatus.FINISHED;
-        this.winnerId = sorted[0].id;
-        this.clearTurnTimer();
+      const sorted = [...this.players].sort((a, b) => b.score - a.score);
+      this.status = GameStatus.FINISHED;
+      this.winnerId = sorted[0].id;
+      this.clearTurnTimer();
     }
   }
 
