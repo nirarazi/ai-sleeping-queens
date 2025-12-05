@@ -11,37 +11,56 @@
 
 .language-switcher {
     display: flex;
-    gap: 5px;
+    gap: 4px;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+.language-switcher:hover {
+    opacity: 0.9;
+}
+
+/* Even more subtle during gameplay */
+.game-room .language-switcher {
+    opacity: 0.2;
+}
+
+.game-room .language-switcher:hover {
+    opacity: 0.85;
 }
 
 /* Only apply absolute positioning when it's not inside the header/flow */
-body > .app-container > .language-switcher,
+body>.app-container>.language-switcher,
 .lobby .language-switcher,
-.app-container > .language-switcher {
+.app-container>.language-switcher {
     position: absolute;
-    top: 10px;
-    inset-inline-end: 10px;
+    top: 8px;
+    inset-inline-end: 8px;
     z-index: 1000;
 }
 
 .language-switcher button {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    padding: 5px 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 3px;
+    padding: 4px 7px;
     cursor: pointer;
-    font-size: 16px;
-    transition: background 0.2s;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .language-switcher button:hover {
     background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
 }
 
 .language-switcher button:disabled {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.4);
     cursor: default;
-    opacity: 0.7;
+    opacity: 1;
+    transform: scale(1);
 }
 
 .error-overlay {
@@ -64,7 +83,7 @@ body > .app-container > .language-switcher,
     text-align: center;
     color: white;
     min-width: 300px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .error-box h3 {
@@ -138,13 +157,24 @@ body > .app-container > .language-switcher,
     padding: 6px 16px;
     border-radius: 20px;
     font-weight: 500;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes pulse-text {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(0.98); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .mini-decks-container {
@@ -166,10 +196,10 @@ body > .app-container > .language-switcher,
 
 .micro-card {
     width: 40px !important;
-    height: 56px !important;
+    aspect-ratio: 5 / 7 !important;
     font-size: 12px !important;
     border-radius: 4px !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 .micro-card .card-top {
@@ -185,16 +215,17 @@ body > .app-container > .language-switcher,
     border: 1px dashed rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     width: 40px;
-    height: 56px;
+    aspect-ratio: 5 / 7;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 9px;
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .status-bar {
-    display: none; /* Deprecated */
+    display: none;
+    /* Deprecated */
 }
 
 .opponents {
@@ -267,7 +298,7 @@ body > .app-container > .language-switcher,
 
 .empty-pile {
     width: 80px;
-    height: 112px;
+    aspect-ratio: 5 / 7;
     border: 2px dashed rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     display: flex;
@@ -290,7 +321,7 @@ body > .app-container > .language-switcher,
 
 .card-placeholder {
     width: 80px;
-    height: 112px;
+    aspect-ratio: 5 / 7;
     border: 2px dashed rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     background: rgba(0, 0, 0, 0.1);
@@ -300,7 +331,8 @@ body > .app-container > .language-switcher,
     background: rgba(0, 0, 0, 0.2);
     padding: 10px;
     border-radius: 12px 12px 0 0;
-    margin-top: auto; /* Push to bottom */
+    margin-top: auto;
+    /* Push to bottom */
     transition: all 0.3s ease;
 }
 
@@ -313,7 +345,8 @@ body > .app-container > .language-switcher,
 .my-area.disabled-turn {
     opacity: 0.7;
     filter: grayscale(0.6);
-    pointer-events: none; /* Disable interactions */
+    pointer-events: none;
+    /* Disable interactions */
     border-top: 4px solid #7f8c8d;
     background: rgba(0, 0, 0, 0.3);
 }
@@ -350,9 +383,17 @@ body > .app-container > .language-switcher,
 }
 
 @keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
 }
 
 .hand {
@@ -385,7 +426,8 @@ body > .app-container > .language-switcher,
 /* Card Styles */
 .card {
     width: 80px;
-    height: 112px;
+    aspect-ratio: 5 / 7;
+    /* Standard playing card ratio */
     background: white;
     border-radius: 6px;
     display: flex;
@@ -396,7 +438,7 @@ body > .app-container > .language-switcher,
     color: #333;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     user-select: none;
     position: relative;
     box-sizing: border-box;
@@ -404,7 +446,7 @@ body > .app-container > .language-switcher,
 
 .card.mini {
     width: 50px;
-    height: 70px;
+    aspect-ratio: 5 / 7;
     padding: 3px;
 }
 
@@ -420,12 +462,13 @@ body > .app-container > .language-switcher,
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     z-index: 10;
 }
 
 .card.selected {
-    border: 3px solid #f1c40f !important; /* Ensure visibility */
+    border: 3px solid #f1c40f !important;
+    /* Ensure visibility */
     transform: translateY(-15px);
     box-shadow: 0 0 15px #f1c40f;
     z-index: 20;
@@ -454,14 +497,45 @@ body > .app-container > .language-switcher,
 }
 
 /* Card Types Colors */
-.type-number { background: #ecf0f1; color: #2c3e50; }
-.type-king { background: #f1c40f; color: #2c3e50; }
-.type-knight { background: #7f8c8d; color: white; }
-.type-dragon { background: #2ecc71; color: white; }
-.type-potion { background: #3498db; color: white; }
-.type-wand { background: #9b59b6; color: white; }
-.type-jester { background: #e67e22; color: white; }
-.type-queen { background: #e84393; color: white; }
+.type-number {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
+.type-king {
+    background: #f1c40f;
+    color: #2c3e50;
+}
+
+.type-knight {
+    background: #7f8c8d;
+    color: white;
+}
+
+.type-dragon {
+    background: #2ecc71;
+    color: white;
+}
+
+.type-potion {
+    background: #3498db;
+    color: white;
+}
+
+.type-wand {
+    background: #9b59b6;
+    color: white;
+}
+
+.type-jester {
+    background: #e67e22;
+    color: white;
+}
+
+.type-queen {
+    background: #e84393;
+    color: white;
+}
 
 .number {
     font-size: 28px;
@@ -513,7 +587,7 @@ body > .app-container > .language-switcher,
     font-size: 24px;
     margin-top: 0;
     margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 10px;
 }
 
@@ -530,7 +604,7 @@ body > .app-container > .language-switcher,
     font-size: 18px;
     padding: 15px;
     border-radius: 6px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .score-header {
@@ -562,15 +636,33 @@ body > .app-container > .language-switcher,
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes bounceIn {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.05); opacity: 1; }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+
+    70% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Lobby Styles */
@@ -654,8 +746,8 @@ body > .app-container > .language-switcher,
 .settings-presets button {
     padding: 5px 10px;
     font-size: 0.9rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     border-radius: 4px;
     cursor: pointer;
@@ -663,7 +755,7 @@ body > .app-container > .language-switcher,
 }
 
 .settings-presets button:hover {
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .settings-presets button.active {
@@ -684,7 +776,8 @@ body > .app-container > .language-switcher,
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
-    align-items: center; /* Align items vertically */
+    align-items: center;
+    /* Align items vertically */
 }
 
 .actions button {
@@ -800,7 +893,7 @@ body > .app-container > .language-switcher,
     font-size: 4rem;
     color: #f1c40f;
     margin: 0 0 20px 0;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .lobby-wait h2 {
@@ -819,7 +912,7 @@ body > .app-container > .language-switcher,
     gap: 15px;
     margin-bottom: 40px;
     font-size: 1.5rem;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .room-id-display strong {
@@ -854,7 +947,7 @@ body > .app-container > .language-switcher,
 
 .players-list h3 {
     margin-top: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 15px;
     color: #bdc3c7;
 }
@@ -924,8 +1017,8 @@ body > .app-container > .language-switcher,
 }
 
 .leave-btn-small {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     border-radius: 4px;
     padding: 5px 10px;
@@ -962,7 +1055,899 @@ body > .app-container > .language-switcher,
 }
 
 @keyframes pulse-timer {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(1.05); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* ============================================
+       MOBILE: FIXED HEADER/FOOTER LAYOUT
+       - TOP (fixed): Turn status, opponents
+       - MIDDLE (scrollable): Queens grid
+       - BOTTOM (fixed): My hand, my queens, actions
+       ============================================ */
+
+    /* Game Room - Fixed layout container */
+    .game-room {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        /* Dynamic viewport height for mobile browsers */
+        padding: 0;
+        overflow: hidden;
+    }
+
+    /* ============================================
+       TOP SECTION (FIXED)
+       ============================================ */
+
+    /* Header - Compact and fixed to top */
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(44, 62, 80, 0.98);
+        backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 6px 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Hide room ID completely on mobile */
+    .room-info h2 {
+        display: none;
+    }
+
+    /* Leave button - minimal, top-left corner */
+    .room-info {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        z-index: 101;
+    }
+
+    .leave-btn-small {
+        font-size: 16px;
+        padding: 4px 8px;
+        background: rgba(231, 76, 60, 0.8);
+        border: 1px solid rgba(231, 76, 60, 0.9);
+        border-radius: 4px;
+    }
+
+    /* Turn Status - Compact but clear */
+    .turn-status {
+        padding: 0 35px;
+        /* Space for leave button on left, language on right */
+    }
+
+    .status-text {
+        font-size: 15px;
+        margin-bottom: 2px;
+    }
+
+    .last-action-highlight {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    .timer-display {
+        font-size: 14px;
+        padding: 2px 6px;
+    }
+
+    /* Hide mini deck previews - not essential during gameplay */
+    .mini-decks-container {
+        display: none;
+    }
+
+    /* Opponents - Horizontal scrollable strip */
+    .opponents {
+        display: flex;
+        gap: 4px;
+        margin: 0;
+        padding: 4px 0;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .opponents::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari */
+    }
+
+    .opponent {
+        padding: 4px 6px;
+        min-width: 70px;
+        max-width: 90px;
+        font-size: 9px;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+    }
+
+    .opponent h3 {
+        font-size: 10px;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .opponent p {
+        font-size: 8px;
+        margin: 1px 0;
+    }
+
+    /* Hide opponent queens to save space */
+    .opponent .mini-queens {
+        display: none;
+    }
+
+    /* ============================================
+       MIDDLE SECTION (SCROLLABLE)
+       ============================================ */
+
+    /* Queens Grid - Scrollable middle section */
+    .queens-grid {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        padding: 8px;
+        margin: 0;
+        max-width: 100%;
+        align-content: start;
+    }
+
+    .card-placeholder {
+        width: 100%;
+        aspect-ratio: 5/7;
+        max-width: 80px;
+        max-height: 112px;
+        justify-self: center;
+    }
+
+    /* Cards in queens grid */
+    .queens-grid .card {
+        width: 100%;
+        aspect-ratio: 5/7;
+        max-width: 80px;
+        max-height: 112px;
+        justify-self: center;
+    }
+
+    /* ============================================
+       BOTTOM SECTION (FIXED)
+       ============================================ */
+
+    /* My Area - Fixed to bottom */
+    .my-area {
+        position: sticky;
+        bottom: 0;
+        z-index: 100;
+        background: rgba(44, 62, 80, 0.98);
+        backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        padding: 6px 4px 4px;
+        margin: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Controls - Action buttons */
+    .controls {
+        margin-bottom: 4px;
+        min-height: 32px;
+        gap: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .controls button {
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .instruction-tooltip {
+        font-size: 11px;
+    }
+
+    /* My Queens - Compact display */
+    .my-queens {
+        margin-bottom: 4px;
+    }
+
+    .my-queens h4 {
+        font-size: 11px;
+        margin: 0 0 3px 0;
+    }
+
+    .queens-row {
+        gap: 3px;
+        margin-bottom: 0;
+        justify-content: center;
+    }
+
+    .queens-row .card {
+        width: 50px;
+        aspect-ratio: 5 / 7;
+    }
+
+    .queens-row .card-placeholder {
+        width: 50px;
+        aspect-ratio: 5 / 7;
+    }
+
+    /* Hand - Horizontal scrollable */
+    .hand {
+        display: flex;
+        gap: 4px;
+        padding: 4px 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        min-height: 80px;
+        max-height: 90px;
+    }
+
+    .hand::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hand .card {
+        width: 55px;
+        aspect-ratio: 5 / 7;
+        flex-shrink: 0;
+    }
+
+    /* ============================================
+       GENERAL CARD STYLES
+       ============================================ */
+
+    .card {
+        width: 60px;
+        aspect-ratio: 5 / 7;
+        padding: 3px;
+    }
+
+    .card-top {
+        font-size: 18px;
+        margin-top: 4px;
+    }
+
+    .card-name {
+        font-size: 8px;
+        margin-bottom: 2px;
+    }
+
+    .number {
+        font-size: 20px;
+    }
+
+    .card.mini {
+        width: 38px;
+        aspect-ratio: 5 / 7;
+        padding: 2px;
+    }
+
+    .card.mini .card-name {
+        font-size: 7px;
+    }
+
+    .card.mini .card-top {
+        font-size: 13px;
+    }
+
+    .empty-pile {
+        width: 60px;
+        aspect-ratio: 5 / 7;
+        font-size: 10px;
+    }
+
+    /* ============================================
+       UTILITY ELEMENTS
+       ============================================ */
+
+    /* Language Switcher - Very subtle */
+    .language-switcher {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+    }
+
+    .language-switcher button {
+        padding: 3px 5px;
+        font-size: 11px;
+    }
+
+    /* Error Box */
+    .error-box {
+        min-width: 250px;
+        max-width: 90%;
+        padding: 15px;
+    }
+
+    .error-box h3 {
+        font-size: 16px;
+    }
+
+    .error-box button {
+        padding: 6px 15px;
+        font-size: 12px;
+    }
+
+    /* ============================================
+       LOBBY & GAME OVER SCREENS
+       ============================================ */
+
+    /* Lobby Styles */
+    .lobby {
+        padding: 20px 15px;
+    }
+
+    .lobby h1 {
+        font-size: 2rem;
+        margin-bottom: 25px;
+    }
+
+    .input-group label {
+        font-size: 1rem;
+    }
+
+    .input-group input {
+        font-size: 1rem;
+        padding: 8px;
+    }
+
+    .game-settings {
+        max-width: 100%;
+        padding: 12px;
+    }
+
+    .game-settings label {
+        font-size: 0.95rem;
+    }
+
+    .actions button {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+
+    .room-list {
+        padding: 15px;
+    }
+
+    .room-item {
+        padding: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .room-item button {
+        width: 100%;
+    }
+
+    /* Lobby Wait Screen */
+    .lobby-wait {
+        padding: 15px;
+    }
+
+    .lobby-wait h1 {
+        font-size: 2.5rem;
+    }
+
+    .lobby-wait h2 {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+    }
+
+    .room-id-display {
+        padding: 10px 15px;
+        font-size: 1.1rem;
+        gap: 10px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .players-list {
+        max-width: 100%;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .players-list h3 {
+        font-size: 1.2rem;
+    }
+
+    .players-list li {
+        padding: 10px;
+        font-size: 1.1rem;
+    }
+
+    .player-avatar {
+        font-size: 1.2rem;
+    }
+
+    .start-btn {
+        padding: 15px 40px !important;
+        font-size: 1.4rem !important;
+    }
+
+    .leave-btn {
+        padding: 15px 30px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .waiting-msg {
+        font-size: 1rem;
+    }
+
+    /* Game Over Screen */
+    .game-over h2 {
+        font-size: 32px;
+        margin-bottom: 15px;
+    }
+
+    .winner-announcement {
+        font-size: 24px;
+        margin-bottom: 25px;
+    }
+
+    .final-scores {
+        padding: 20px;
+        min-width: 280px;
+        max-width: 90%;
+    }
+
+    .final-scores h4 {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+
+    .scores-list {
+        gap: 10px;
+    }
+
+    .score-entry {
+        padding: 10px;
+        font-size: 15px;
+    }
+
+    .restart-btn {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+}
+
+/* Extra small devices (phones in portrait, less than 400px) */
+@media (max-width: 400px) {
+    .game-room {
+        padding: 3px;
+    }
+
+    .header {
+        padding: 5px;
+        gap: 5px;
+    }
+
+    .status-text {
+        font-size: 16px;
+    }
+
+    .last-action-highlight {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    .card {
+        width: 50px;
+        aspect-ratio: 5 / 7;
+    }
+
+    .card-top {
+        font-size: 16px;
+        margin-top: 3px;
+    }
+
+    .card-name {
+        font-size: 7px;
+    }
+
+    .empty-pile {
+        width: 50px;
+        aspect-ratio: 5 / 7;
+    }
+
+    .queens-grid {
+        max-width: 230px;
+        gap: 4px;
+    }
+
+    .card-placeholder {
+        width: 50px;
+        aspect-ratio: 5 / 7;
+    }
+
+    .hand {
+        gap: 4px;
+        min-height: 75px;
+    }
+
+    .lobby h1 {
+        font-size: 1.8rem;
+    }
+
+    .lobby-wait h1 {
+        font-size: 2rem;
+    }
+
+    .final-scores {
+        min-width: 250px;
+    }
+}
+
+/* ============================================
+   PHONE LANDSCAPE OPTIMIZATION
+   ============================================ */
+@media (max-width: 768px) and (max-height: 500px) and (orientation: landscape) {
+
+    /* Horizontal layout for landscape phones */
+    .game-room {
+        flex-direction: row;
+        height: 100vh;
+        height: 100dvh;
+    }
+
+    /* Left side: Game board */
+    .header,
+    .opponents,
+    .queens-grid {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .header {
+        position: static;
+        flex: 0 0 auto;
+        padding: 4px;
+        border-bottom: none;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .opponents {
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 4px;
+        gap: 3px;
+    }
+
+    .opponent {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .queens-grid {
+        grid-template-columns: repeat(3, 1fr);
+        padding: 4px;
+        gap: 4px;
+    }
+
+    /* Right side: My area */
+    .my-area {
+        position: static;
+        flex: 0 0 280px;
+        border-top: none;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .hand {
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: none;
+    }
+
+    .hand .card {
+        width: 70px;
+        flex-shrink: 0;
+    }
+
+    .my-queens {
+        order: -1;
+        /* Move above hand */
+    }
+
+    .controls {
+        order: -2;
+        /* Move to top */
+    }
+}
+
+/* ============================================
+   TABLET PORTRAIT (iPad, etc.)
+   ============================================ */
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+    .game-room {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    /* Header - Slightly larger than phone */
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(44, 62, 80, 0.98);
+        backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .status-text {
+        font-size: 20px;
+    }
+
+    .last-action-highlight {
+        font-size: 14px;
+        padding: 4px 10px;
+    }
+
+    .timer-display {
+        font-size: 18px;
+    }
+
+    /* Opponents - Horizontal scroll */
+    .opponents {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 8px 0;
+    }
+
+    .opponent {
+        min-width: 120px;
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    /* Queens Grid - 5 columns for tablets */
+    .queens-grid {
+        flex: 1;
+        overflow-y: auto;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        padding: 15px;
+        align-content: start;
+    }
+
+    .queens-grid .card,
+    .card-placeholder {
+        width: 100%;
+        aspect-ratio: 5 / 7;
+        max-width: 120px;
+        justify-self: center;
+    }
+
+    /* My Area - Larger cards */
+    .my-area {
+        position: sticky;
+        bottom: 0;
+        z-index: 100;
+        background: rgba(44, 62, 80, 0.98);
+        backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        padding: 12px 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .controls button {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+
+    .my-queens h4 {
+        font-size: 14px;
+    }
+
+    .queens-row .card {
+        width: 70px;
+    }
+
+    .hand {
+        gap: 6px;
+        min-height: 110px;
+        max-height: 120px;
+    }
+
+    .hand .card {
+        width: 75px;
+    }
+
+    .card {
+        width: 90px;
+    }
+}
+
+/* ============================================
+   TABLET LANDSCAPE (iPad horizontal, etc.)
+   ============================================ */
+@media (min-width: 769px) and (max-width: 1280px) and (orientation: landscape) {
+    .game-room {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        grid-template-rows: auto 1fr;
+        height: 100vh;
+        height: 100dvh;
+        padding: 0;
+        overflow: hidden;
+        gap: 0;
+    }
+
+    /* Header spans both columns */
+    .header {
+        grid-column: 1 / -1;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(44, 62, 80, 0.98);
+        backdrop-filter: blur(10px);
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .turn-status {
+        flex: 1;
+        padding: 0 40px;
+    }
+
+    .status-text {
+        font-size: 20px;
+    }
+
+    /* Opponents - horizontal in header */
+    .opponents {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 0;
+        margin: 0;
+        flex: 0 0 auto;
+        max-width: 400px;
+    }
+
+    .opponent {
+        min-width: 100px;
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    /* Left column: Queens grid */
+    .queens-grid {
+        grid-column: 1;
+        grid-row: 2;
+        overflow-y: auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding: 20px;
+        align-content: start;
+    }
+
+    .queens-grid .card,
+    .card-placeholder {
+        width: 100%;
+        aspect-ratio: 5 / 7;
+        max-width: 140px;
+        justify-self: center;
+    }
+
+    /* Right column: My area */
+    .my-area {
+        grid-column: 2;
+        grid-row: 2;
+        position: static;
+        background: rgba(44, 62, 80, 0.98);
+        backdrop-filter: blur(10px);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .controls {
+        order: -2;
+        margin-bottom: 8px;
+    }
+
+    .controls button {
+        padding: 14px 28px;
+        font-size: 18px;
+    }
+
+    .my-queens {
+        order: -1;
+        margin-bottom: 8px;
+    }
+
+    .my-queens h4 {
+        font-size: 15px;
+    }
+
+    .queens-row {
+        justify-content: flex-start;
+    }
+
+    .queens-row .card {
+        width: 70px;
+    }
+
+    .hand {
+        flex-direction: column;
+        gap: 6px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: auto;
+        max-height: none;
+        flex: 1;
+    }
+
+    .hand .card {
+        width: 85px;
+        flex-shrink: 0;
+    }
+
+    .card {
+        width: 100px;
+    }
 }
